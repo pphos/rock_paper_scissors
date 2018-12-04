@@ -52,6 +52,7 @@ def copy_images(images, dataset_type, category_path, save_dir):
     if not os.path.exists(save_category_dir):
         os.makedirs(save_category_dir)
 
+    # 対象ディレクトリへの画像のコピー
     for progress, image in enumerate(images):
         input_image_path = os.path.join(category_path, image)
         print("{:10s} {}: {} -> {}"
