@@ -2,6 +2,7 @@
 import os
 import random
 import shutil
+import argparse
 
 
 TRAINING_SET_NAME = "training_set"
@@ -17,7 +18,6 @@ def separate_train_test_data(raw_data_dir, save_dir):
                       階層構造: raw->category->image_path
         save_dir    : データを保存するディレクトリへのパス
     """
-
     # カテゴリの一覧を取得
     categories = os.listdir(raw_data_dir)
     for category in categories:
@@ -46,7 +46,6 @@ def copy_images(images, dataset_type, category_path, save_dir):
         category_path   : 画像が保存されているカテゴリへのパス
         save_dir        : 保存先のディレクトリ名
     """
-
     # 画像の保存先ディレクトリの作成
     category = os.path.basename(category_path)
     save_category_dir = os.path.join(save_dir, dataset_type, category)
@@ -60,8 +59,27 @@ def copy_images(images, dataset_type, category_path, save_dir):
         shutil.copy(input_image_path, save_category_dir)
 
 
-if __name__ == '__main__':
-    raw_data_dir = '../../datasets/tiny_raw'
-    save_dir = '../../datasets'
+def __get_arguments():
+    """
+    コマンドライン引数の取得
+    # Arguments
+        args    : Namespaceオブジェクト
+    """
+    parser = argparse.ArgumentParser()
 
-    separate_train_test_data(raw_data_dir, save_dir)
+    # 必須引数の設定
+    parser.add_argument(dest="raw_data_dir",
+                        help="画像データセットのディレクトリへのパス")
+    parser.add_argument(dest="save_dir",
+                        help="評価・訓練データの保存先")
+
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    # コマンドライン引数の取得
+    args = __get_arguments()
+
+    print("==== START SPLIT DATASET ====")
+    separate_train_test_data(args.raw_data_dir, args.save_dir)
+    print("==== FINISH SPLIT DATASET =====")
