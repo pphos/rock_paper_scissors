@@ -5,6 +5,7 @@ import argparse
 import numpy as np
 import cv2
 
+
 TRINING_FEATURE_NAME = 'training_features'
 EVALUATION_FEATURE_NAME = 'eval_features'
 GRAY_SCALE = 1
@@ -18,10 +19,13 @@ def convert_imgs_to_arrays(input_dir, dataset_type, save_dir, img_shape):
         save_dir    : Numpy形式の画像を保存するフォルダへのパス
     """
     # 保存ファイル名の設定
-    data_path = os.path.join(save_dir, dataset_type, 'data.npy')
-    target_path = os.path.join(save_dir, dataset_type, 'target.npy')
-    target_label_path = os.path.join(save_dir, dataset_type,
-                                     'target_label.pkl')
+    save_base_dir = os.path.join(save_dir, dataset_type)
+    data_path = os.path.join(save_base_dir, 'data.npy')
+    target_path = os.path.join(save_base_dir, 'target.npy')
+    target_label_path = os.path.join(save_base_dir, 'target_label.pkl')
+    if not os.path.exists(save_base_dir):
+        os.makedirs(save_base_dir)
+
     # カテゴリの取得
     categories = os.listdir(input_dir)
     # データを保存するNumpy配列の初期化
@@ -40,8 +44,8 @@ def convert_imgs_to_arrays(input_dir, dataset_type, save_dir, img_shape):
             target[progress] = index
 
             progress += 1
-            print("{:04d}: {} {} :{}".format(progress, index,
-                                             category, image_name))
+            print("{:04d}: {} {:10s} :{}".format(progress, index,
+                                                 category, image_name))
 
     # 訓練・教師データおよびラベルの保存
     with open(target_label_path, 'wb') as f:
@@ -60,7 +64,7 @@ def resize_image(img_path, img_shape):
         img_resized : リサイズ後の画像のNumpy配列
     """
     image = cv2.imread(img_path)
-    img_resized = cv2.resize(image, img_shape, img_shape)
+    img_resized = cv2.resize(image, (img_shape, img_shape))
 
     return img_resized
 
@@ -90,9 +94,10 @@ def __init_np_array(input_dir, categories, img_shape):
             img = resize_image(img_path, img_shape)
 
             if len(img.shape) == GRAY_SCALE:
-                data = np.zeros((total_file_nums, *img_shape))
+                data = np.zeros((total_file_nums, img_shape, img_shape))
             else:
-                data = np.zeros((total_file_nums, *img_shape, img.shape[-1]))
+                data = np.zeros((total_file_nums,
+                                 img_shape, img_shape, img.shape[-1]))
             break
 
         if data is not None:
@@ -118,10 +123,40 @@ def __calc_total_file_nums(input_dir, categories):
     return total_file_nums
 
 
-if __name__ == '__main__':
-    input_dir = '../../datasets/training_set'
-    save_dir = '../../datasets'
-    img_shape = 256
+def __get_arguments():
+    """
+    コマンドライン引数の取得
+    # Arguments:
+        args    : Namespaceオブジェクト
+    """
+    parser = argparse.ArgumentParser()
 
-    convert_imgs_to_arrays(
-        input_dir, TRINING_FEATURE_NAME, save_dir, img_shape)
+    # 必須引数の設定
+    parser.add_argument(dest="input_dir",
+                        help="入力画像があるフォルダへのパス")
+    parser.add_argument(dest="save_dir",
+                        help="Numpy形式の画像を保存するフォルダへのパス")
+
+    # 任意引数の設定
+    parser.add_argument('-is', '--img_shape', dest='img_shape',
+                        help="リサイズする画像のサイズ",
+                        default=256, type=int)
+
+    args = parser.parse_args()
+    return args
+
+
+if __name__ == '__main__':
+    # コマンドライン引数の取得
+    args = __get_arguments()
+
+    print("=== START Convert Images to Ndarrays ====")
+
+    # 訓練セットをNdarraysに変換
+    convert_imgs_to_arrays(args.input_dir, TRINING_FEATURE_NAME,
+                           args.save_dir, args.img_shape)
+    # 評価セットをNdarraysに変換
+    convert_imgs_to_arrays(args.input_dir, EVALUATION_FEATURE_NAME,
+                           args.save_dir, args.img_shape)
+
+    print("==== FINISH Convert Image to Ndarrays =====")
