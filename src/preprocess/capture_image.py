@@ -68,11 +68,11 @@ def capture_image(device_code, save_dir, sampling_times=1000):
     cv2.destroyAllWindows()
 
 
-def get_arguments():
+def __get_arguments():
     """
     コマンドライン引数の取得
     # Returns:
-        args : ArgumentParserオブジェクト
+        args : Namespaceオブジェクト
     """
     parser = argparse.ArgumentParser()
 
@@ -94,7 +94,7 @@ def get_arguments():
 
 if __name__ == '__main__':
     # コマンド引数の取得
-    args = get_arguments()
+    args = __get_arguments()
 
     # 保存先のディレクトリが存在しない場合に作成する
     save_dir_path = os.path.join(args.save_root_path, args.label)
