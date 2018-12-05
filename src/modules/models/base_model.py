@@ -19,13 +19,9 @@ class BaseModel(metaclass=ABCMeta):
         self.history = None
         self.callbacks = callbacks
 
-        self.loss = None
-        self.optimizer = None
-        self.metrics = None
-
     @classmethod
     @abstractmethod
-    def define_model(cls):
+    def struct_model(cls):
         """
         self.nameに対応するモデルを構築する抽象メソッド
         """
@@ -33,26 +29,8 @@ class BaseModel(metaclass=ABCMeta):
 
     def plot_model_structure(self):
         """
-        self.save_dirにモデル構造を描画した画像の保存
+        self.save_dirにモデルの構造を描画
         """
-        plot_name = '{}_model.png'.format(self.name)
-        plot_path = os.path.join(self.save_dir, plot_name)
-        plot_model(self.model, to_file=plot_path, show_shape=True)
-
-    def summary(self):
-        """
-        モデルのサマリーの表示
-        """
-        return self.model.summary()
-
-    def compile(self, loss, optimizer, metrics):
-        """
-        モデルのコンパイル
-        """
-        self.loss = loss
-        self.optmizer = optimizer
-        self.metrics = metrics
-
-        self.model.compile(loss=loss,
-                           optimizer=optimizer,
-                           metrics=metrics)
+        plot_path = os.path.join(self.save_dir,
+                                 '{}_model.png'.format(self.name))
+        plot_model(self.model, to_file=plot_path, show_shapes=True)
