@@ -18,6 +18,16 @@ def load_binary_file(filepath):
     return data
 
 
+def save_binary_data(data, filepath):
+    """
+    pickle形式のバイナリデータを書き込み
+    # Arguments:
+        filepath    : 保存対象ファイル (pickle形式)
+    """
+    with open(filepath, 'wb') as f:
+        pickle.dump(data, f)
+
+
 def load_dataset(data_path, target_path, target_label_path):
     """
     データセットの読み込み
