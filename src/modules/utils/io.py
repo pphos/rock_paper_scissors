@@ -1,8 +1,25 @@
 # -*- coding: utf-8 -*-
+import os
 import pickle
 import numpy as np
 
 from . import Bunch
+
+
+def determine_save_name_path(save_dir, save_name, save_prefix=None):
+    """
+    保存ファイル名の決定
+    # Arguments:
+        save_dir    : 保存先のディレクトリパス
+        save_name   : 保存ファイル名
+        save_prefix : ファイル名に付与するプレフィクス
+    """
+
+    if save_prefix is not None:
+        file_name = '{}_{}'.format(save_prefix, save_name)
+    file_path = os.path.join(save_dir, file_name)
+
+    return file_path
 
 
 def load_binary_file(filepath):
