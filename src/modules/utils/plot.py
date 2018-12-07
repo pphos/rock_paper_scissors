@@ -66,7 +66,7 @@ def plot_confusion_matrix(cm, target_names, save_dir, save_name,
         cmap            : グラフのカラーマップ
             ex) cmap=plt.cm.Blues
     """
-    plt.figure(figsize=(16, 9))
+    plt.figure(figsize=(9, 9))
     plt.rcParams['font.size'] = 24
 
     if normalize:
