@@ -1,14 +1,9 @@
 # -*- coding :utf-8 -*-
-import os
 import numpy as np
-from sklearn.utils import shuffle
 from keras.models import load_model
 
-from utils.io import load_dataset
-from utils.preprocess import adjust_to_keras_input_image
 
-
-def test_model(model_path, weight_path, X_test, y_test):
+def test_model(X_test, y_test, model=None, model_path=None, weight_path=None):
     """
     モデルの評価
     # Arguments:
@@ -24,8 +19,9 @@ def test_model(model_path, weight_path, X_test, y_test):
             'y_pred'    : 評価用データの予測ラベル
     """
     # モデルと学習済みの重みの読み込み
-    model = load_model(model_path)
-    model.load_weights(weight_path)
+    if (model_path is not None) and (weight_path is not None):
+        model = load_model(model_path)
+        model.load_weights(weight_path)
 
     # モデルの評価
     loss, accurary = model.evaluate(X_test, y_test)
@@ -43,30 +39,3 @@ def test_model(model_path, weight_path, X_test, y_test):
     }
 
     return result_dict
-
-
-if __name__ == '__main__':
-    # 各種データパスの指定
-    data_path = '../../datasets/eval_features/data.npy'
-    target_path = '../../datasets/eval_features/target.npy'
-    target_label_path = '../../datasets/eval_features/target_label.pkl'
-    model_path = '../../results/MnistCNN_model.h5'
-    weight_path = '../../results/MnistCNN_weights.001-10.4630.hdf5'
-
-    # データセットの読み込み
-    dataset = load_dataset(data_path, target_path, target_label_path)
-    X = dataset.data
-    y = dataset.target
-    nb_classes = len(dataset.target_label)
-
-    # データの前処理
-    X, y = adjust_to_keras_input_image(X, y, nb_classes)
-    X, y = shuffle(X, y, random_state=12345)
-
-    # モデルの評価
-    result_dict = test_model(model_path, weight_path, X, y)
-
-    # 評価結果の保存
-    from utils.io import save_binary_data
-    save_path = '../../results/evaluate_result.pkl'
-    save_binary_data(result_dict, save_path)
