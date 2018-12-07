@@ -6,21 +6,16 @@ from keras.callbacks import (
     ModelCheckpoint,
     ReduceLROnPlateau
 )
-from sklearn.utils import shuffle
 from sklearn.utils.class_weight import compute_class_weight
 
-from utils.io import load_dataset
-from utils.preprocess import adjust_to_keras_input_image
-from models.model_selection import select_model
 
-
-def train_model(model, X_train, y_train, model_conf):
+def train_model(X_train, y_train, model, model_conf):
     """
     モデルの学習
     # Arguments:
-        model       : Modelオブジェクト
         X_train     : 訓練データ (Numpy配列)
         y_train     : 教師データのOne-hot表現 (Numpy配列)
+        model       : Modelオブジェクト
         model_conf  : 学習に用いるパラメータを格納した辞書
     # Returns:
         history     : historyオブジェクト
@@ -30,7 +25,7 @@ def train_model(model, X_train, y_train, model_conf):
 
     # 指定がある場合にクラスごとに重み付けを行う
     if model_conf['set_class_weight']:
-        class_weight_dict = calc_class_weight(y)
+        class_weight_dict = calc_class_weight(y_train)
     else:
         # Keras のデフォルトではclass_weightはNone
         class_weight_dict = None
@@ -110,46 +105,3 @@ def configure_callbacks(model_conf):
                                      mode='min'))
 
     return callbacks
-
-
-if __name__ == '__main__':
-    model_name = 'MnistCNN'
-    model_save_dir = '../../results'
-
-    # 各データのパスの指定
-    data_path = '../../datasets/training_features/data.npy'
-    target_path = '../../datasets/training_features/target.npy'
-    target_label_path = '../../datasets/training_features/target_label.pkl'
-
-    # データセットの読み込み
-    dataset = load_dataset(data_path, target_path, target_label_path)
-    X = dataset.data
-    y = dataset.target
-    nb_classes = len(dataset.target_label)
-
-    # 訓練・教師データの前処理
-    X, y = adjust_to_keras_input_image(X, y, nb_classes)
-    X, y = shuffle(X, y, random_state=12345)
-
-    # 訓練モデルの選択
-    model = select_model(model_name)
-    model = model(name=model_name,
-                  input_shape=X.shape[1:],
-                  nb_classes=nb_classes,
-                  save_dir=model_save_dir)
-
-    model_conf = {
-        'name': model_name,
-        'save_dir': model_save_dir,
-        'epochs': 1,
-        'batch_size': 1,
-        'validation_split': 0.1,
-        'loss': 'categorical_crossentropy',
-        'optimizer': 'adam',
-        'metrics': ['accuracy'],
-        'set_class_weight': True,
-        'enable_early_stopping': True,
-    }
-
-    # モデルの訓練
-    train_model(model.model, X, y, model_conf)
