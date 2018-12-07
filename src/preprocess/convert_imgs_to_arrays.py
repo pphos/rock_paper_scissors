@@ -5,13 +5,10 @@ import argparse
 import numpy as np
 import cv2
 
-
-TRINING_FEATURE_NAME = 'training_features'
-EVALUATION_FEATURE_NAME = 'eval_features'
 GRAY_SCALE = 1
 
 
-def convert_imgs_to_arrays(input_dir, dataset_type, save_dir, img_shape):
+def convert_imgs_to_arrays(input_dir, save_dir, img_shape=256):
     """
     データセットの画像をNumpy配列に変換
     # Arguments
@@ -19,12 +16,11 @@ def convert_imgs_to_arrays(input_dir, dataset_type, save_dir, img_shape):
         save_dir    : Numpy形式の画像を保存するフォルダへのパス
     """
     # 保存ファイル名の設定
-    save_base_dir = os.path.join(save_dir, dataset_type)
-    data_path = os.path.join(save_base_dir, 'data.npy')
-    target_path = os.path.join(save_base_dir, 'target.npy')
-    target_label_path = os.path.join(save_base_dir, 'target_label.pkl')
-    if not os.path.exists(save_base_dir):
-        os.makedirs(save_base_dir)
+    data_path = os.path.join(save_dir, 'data.npy')
+    target_path = os.path.join(save_dir, 'target.npy')
+    target_label_path = os.path.join(save_dir, 'target_label.pkl')
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
 
     # カテゴリの取得
     categories = os.listdir(input_dir)
@@ -152,11 +148,7 @@ if __name__ == '__main__':
 
     print("=== START Convert Images to Ndarrays ====")
 
-    # 訓練セットをNdarraysに変換
-    convert_imgs_to_arrays(args.input_dir, TRINING_FEATURE_NAME,
-                           args.save_dir, args.img_shape)
-    # 評価セットをNdarraysに変換
-    convert_imgs_to_arrays(args.input_dir, EVALUATION_FEATURE_NAME,
-                           args.save_dir, args.img_shape)
+    # データセットをNdarraysに変換
+    convert_imgs_to_arrays(args.input_dir, args.save_dir, args.img_shape)
 
     print("==== FINISH Convert Image to Ndarrays =====")
