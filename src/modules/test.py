@@ -1,6 +1,5 @@
 # -*- coding :utf-8 -*-
 import os
-import pickle
 import numpy as np
 from sklearn.utils import shuffle
 from keras.models import load_model
@@ -17,6 +16,12 @@ def test_model(model_path, weight_path, X_test, y_test):
         weight_path : 学習済みの重みへパス
         X_test      : 評価用データ (Numpy配列)
         y_test      : 評価用データのラベルのOne-hot表現 (Numpy配列)
+    # Returns:
+        result_dict : 評価結果を格納した辞書
+            'loss'      : 評価用データについてのloss値
+            'accurary'  : 評価用データについての精度
+            'y_true'    : 評価用データの正解ラベル
+            'y_pred'    : 評価用データの予測ラベル
     """
     # モデルと学習済みの重みの読み込み
     model = load_model(model_path)
@@ -26,9 +31,18 @@ def test_model(model_path, weight_path, X_test, y_test):
     loss, accurary = model.evaluate(X_test, y_test)
 
     # モデルが予測したクラスの計算
-    y_prod = model.predict(X_test, verbose=1)
-    y_prod = y_prod.argmax(axis=1)
+    y_pred = model.predict(X_test, verbose=1)
+    y_pred = y_pred.argmax(axis=1)
     y_true = np.argmax(y_test, axis=1)
+
+    result_dict = {
+        'loss': loss,
+        'accurary': accurary,
+        'y_true': y_true,
+        'y_pred': y_pred
+    }
+
+    return result_dict
 
 
 if __name__ == '__main__':
@@ -50,4 +64,9 @@ if __name__ == '__main__':
     X, y = shuffle(X, y, random_state=12345)
 
     # モデルの評価
-    test_model(model_path, weight_path, X, y)
+    result_dict = test_model(model_path, weight_path, X, y)
+
+    # 評価結果の保存
+    from utils.io import save_binary_data
+    save_path = '../../results/evaluate_result.pkl'
+    save_binary_data(result_dict, save_path)
