@@ -17,6 +17,8 @@ def determine_save_name_path(save_dir, save_name, save_prefix=None):
 
     if save_prefix is not None:
         file_name = '{}_{}'.format(save_prefix, save_name)
+    else:
+        file_name = save_name
     file_path = os.path.join(save_dir, file_name)
 
     return file_path
