@@ -47,6 +47,17 @@ def save_binary_data(data, filepath):
         pickle.dump(data, f)
 
 
+def write_message(message, filepath):
+    """
+    テキストデータの書き込み
+    # Arguments:
+        message     : 書き込み対象のメッセージ
+        filepath    : 保存対象ファイル (txt形式)
+    """
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(message)
+
+
 def load_dataset(data_path, target_path, target_label_path):
     """
     データセットの読み込み
