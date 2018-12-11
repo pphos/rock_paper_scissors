@@ -58,7 +58,7 @@ def write_message(message, filepath):
         f.write(message)
 
 
-def load_dataset(data_path, target_path, target_label_path):
+def load_dataset(data_path, target_path, target_label_path=None):
     """
     データセットの読み込み
     # Arguments:
@@ -76,9 +76,13 @@ def load_dataset(data_path, target_path, target_label_path):
     # 各種データの読み込み
     data = np.load(data_path)
     target = np.load(target_path)
-    target_label = load_binary_file(target_label_path)
 
-    dataset = Bunch(data=data, target=target,
-                    target_label=target_label)
+    if target_label_path is not None:
+        target_label = load_binary_file(target_label_path)
+        dataset = Bunch(data=data,
+                        target=target,
+                        target_label=target_label)
+    else:
+        dataset = Bunch(data=data, target=target)
 
     return dataset
