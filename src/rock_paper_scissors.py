@@ -124,7 +124,7 @@ def __get_arguments():
     # model_conf の引数設定
     model_args = parser.add_argument_group('model_conf arguments')
 
-    model_args.add_argument('-e' '--epochs', dest='epochs',
+    model_args.add_argument('-e', '--epochs', dest='epochs',
                             help='モデルを訓練するエポック数 (int)',
                             default=100, type=int)
     model_args.add_argument('-bs', '--batch_size', dest='batch_size',
