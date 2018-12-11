@@ -1,49 +1,8 @@
 # -*- coding :utf-8 -*-
 import argparse
-from sklearn.utils import shuffle
-
-from modules.utils import Bunch
-from modules.utils.io import (
-    load_dataset,
-    init_result_save_dir
-)
-from modules.utils.preprocess import adjust_to_keras_input_image
+from modules.utils.io import init_result_save_dir
+from modules.utils.preprocess import load_and_preprocess_dataset
 from modules.models.model_selection import select_model
-
-
-def load_and_preprocess_dataset(data_path, target_path,
-                                target_label_path, random_state=12345):
-    """
-    データセットの読み込みと前処理の統合
-    # Arguments
-        data_path           : 入力データのパス (Numpy形式)
-        target_path         : 教師データのパス (Numpy形式)
-        target_label_path   : 教師ラベルのパス (pickle形式)
-    # Returns
-        preprocessed_dataset: Bunch オブジェクト
-         Attribute)
-            X               : 前処理後の入力データ (Numpy配列)
-            y               : 前処理後の教師データ (Numpy配列)
-            target_label    : 教師ラベル (pickle形式)
-         ex)
-            dataset = load_and_preprocess_dataset(data_path, target_path, target_label_path)
-            X = dataset.X
-            y = dataset.y
-            target_label = dataset.target_label
-    """
-    # データセットの読み込み
-    dataset = load_dataset(data_path, target_path, target_label_path)
-    X = dataset.data
-    y = dataset.target
-    nb_classes = len(dataset.target_label)
-
-    # データセットの前処理
-    X, y = adjust_to_keras_input_image(X, y, nb_classes)
-    X, y = shuffle(X, y, random_state=random_state)
-
-    preprocessed_dataset = Bunch(X=X, y=y, target_label=dataset.target_label)
-
-    return preprocessed_dataset
 
 
 def init_each_config(args, target_label):
@@ -53,7 +12,7 @@ def init_each_config(args, target_label):
         args            : コマンドライン引数
         target_label    : 正解ラベル (pickle形式)
     # Returns
-        model_conf      : モデル情報を格納した辞書 
+        model_conf      : モデル情報を格納した辞書
         save_conf       : 結果の保存に関する情報を格納した辞書
     """
     # 保存対象ディレクトリの初期化
