@@ -69,14 +69,13 @@ class BaseModel(metaclass=ABCMeta):
         self.model = load_model(model_path)
         self.model.load_weights(weight_path)
 
-    def train(self, X_train, y_train, model_conf, save_conf=None):
+    def train(self, X_train, y_train, model_conf):
         """
         モデルの学習
         # Arguments:
             X_train     : 訓練データ (Numpy配列)
             y_train     : 教師データのOne-hot表現 (Numpy配列)
             model_conf  : 学習に用いるパラメータを格納した辞書
-            save_conf   : 訓練情報保存に用いる設定を格納した辞書
         # Returns:
             history     : historyオブジェクト
         """
@@ -109,8 +108,10 @@ class BaseModel(metaclass=ABCMeta):
         self.model.save(model_save_path)
 
         # 訓練loss, accの描画
-        if save_conf is not None:
-            plot_loss_acc_history(history.history, **save_conf)
+        save_name = "{}_training_loss_and_accuracy.png"\
+            .format(model_conf['name'])
+        plot_loss_acc_history(history.history,
+                              model_conf['save_dir'], save_name)
 
         return history
 
@@ -182,6 +183,8 @@ class BaseModel(metaclass=ABCMeta):
                 if save_prefix is not None:
                     save_prefix = '{}_{}'\
                         .format('normalize', save_conf['save_prefix'])
+                else:
+                    save_prefix = 'normalize'
 
             plot_confusion_matrix(cm=cnf_matrix,
                                   target_names=save_conf['target_names'],
