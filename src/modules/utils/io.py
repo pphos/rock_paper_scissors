@@ -2,6 +2,7 @@
 import os
 import pickle
 import numpy as np
+from datetime import datetime
 
 from . import Bunch
 
@@ -22,6 +23,52 @@ def determine_save_name_path(save_dir, save_name, save_prefix=None):
     file_path = os.path.join(save_dir, file_name)
 
     return file_path
+
+
+def init_result_save_dir(save_root, name, unique=False):
+    """
+    保存ディレクトリの初期化
+    (対象ディレクトリが存在していない場合には作成)
+    # Arguments
+        save_root   : 結果を保存するルートディレクトリのパス
+        name        : 結果を保存するサブディレクトリ名
+        unique      : ユニークなディレクトリ名をつけるかのフラグ (bool)
+    # Returns
+        save_dirs   : 保存ディレクトリパスを格納した辞書
+         Attribute)
+            model   : モデル情報の保存ディレクトリ
+            figure  : 評価結果の情報を保存するディレクトリ
+    """
+    if unique:
+        date = datetime.now().strftime("%Y%m%d_%H%M")
+    else:
+        date = ''
+
+    model_save_dir = make_save_dir(save_root, name, date, 'model')
+    figure_save_dir = make_save_dir(save_root, name, date, 'figure')
+
+    save_dirs = {
+        'model': model_save_dir,
+        'figure': figure_save_dir
+    }
+
+    return save_dirs
+
+
+def make_save_dir(*args):
+    """
+    引数で指定されたディレクトリが存在しない場合にそのディレクトリを作成
+    # Arguments:
+        args    : ディレクトリ名
+    # Returns
+        dir_path    : 保存対象のディレクトリのパス
+    """
+    dir_path = os.path.join(*args)
+
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    return dir_path
 
 
 def load_binary_file(filepath):
