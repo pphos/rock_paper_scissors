@@ -190,13 +190,6 @@ if __name__ == '__main__':
 
     model_conf, save_conf = init_each_config(args, train_dataset.target_label)
 
-    history_conf = {
-        'save_name': 'training_loss_and_accuracy.png',
-        'save_dir': '../results',
-        'title': 'MnistCNN Model',
-        'save_prefix': None
-    }
-
     # 訓練モデルの選択
     model = select_model(model_conf['name'])
     model = model(name=model_conf['name'],
@@ -205,7 +198,7 @@ if __name__ == '__main__':
                   save_dir=model_conf['save_dir'])
 
     # モデルの訓練
-    model.train(train_dataset.X, train_dataset.y, model_conf, history_conf)
+    model.train(train_dataset.X, train_dataset.y, model_conf)
     # モデルの評価
     model.evaluate(test_dataset.X, test_dataset.y)
     # モデルの評価結果の可視化
