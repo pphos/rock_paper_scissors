@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import itertools
 import numpy as np
-import matplotlib as mpl
-mpl.use('Agg')
 import matplotlib.pyplot as plt
 
 from .io import determine_save_name_path
