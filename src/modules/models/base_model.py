@@ -241,11 +241,12 @@ def _calc_class_weight(y_train):
     return class_weight_dict
 
 
-def _configure_callbacks(model_conf):
+def _configure_callbacks(model_conf, use_tpu=False):
     """
     コールバック関数の設定
     # Arguments:
         model_conf  : 学習に用いるパラメータを格納した辞書
+        use_tpu     : TPUの使用フラグ
     # Returns:
         callbacks   : コールバック関数を格納したリスト
     """
@@ -265,15 +266,17 @@ def _configure_callbacks(model_conf):
                                        min_lr=0.5e-6))
 
     # モデルの重みを保存
-    save_weight_name = '{}_weights.{{epoch:03d}}-{{loss:.4f}}.hdf5'\
-        .format(model_conf['name'])
-    save_weight_path = os.path.join(model_conf['save_dir'], save_weight_name)
-    callbacks.append(ModelCheckpoint(filepath=save_weight_path,
-                                     monitor='val_loss',
-                                     verbose=1,
-                                     save_best_only=True,
-                                     save_weights_only=True,
-                                     mode='min'))
+    if not use_tpu:
+        save_weight_name = '{}_weights.{{epoch:03d}}-{{loss:.4f}}.hdf5'\
+            .format(model_conf['name'])
+        save_weight_path =\
+            os.path.join(model_conf['save_dir'], save_weight_name)
+        callbacks.append(ModelCheckpoint(filepath=save_weight_path,
+                                         monitor='val_loss',
+                                         verbose=1,
+                                         save_best_only=True,
+                                         save_weights_only=True,
+                                         mode='min'))
 
     # TensorBoardの利用設定
     log_dir = os.path.join(model_conf['save_dir'], 'log_dir')
