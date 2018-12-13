@@ -108,8 +108,8 @@ class BaseModel(metaclass=ABCMeta):
                 )
             )
             model.compile(
-                optimizer=model_conf['loss'],
-                loss=model_conf['optimizer'],
+                optimizer=model_conf['optimizer'],
+                loss=model_conf['loss'],
                 metrics=model_conf['metrics'])
         else:
             # モデルのコンパイル
