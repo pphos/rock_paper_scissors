@@ -82,7 +82,7 @@ class BaseModel(metaclass=ABCMeta):
             history     : historyオブジェクト
         """
         # コールバック関数の設定
-        callbacks = _configure_callbacks(model_conf)
+        callbacks = _configure_callbacks(model_conf, use_tpu)
 
         # 指定がある場合にクラスごとに重み付けを行う
         if model_conf['set_class_weight']:
@@ -124,7 +124,8 @@ class BaseModel(metaclass=ABCMeta):
                             batch_size=model_conf['batch_size'],
                             epochs=model_conf['epochs'],
                             validation_split=model_conf['validation_split'],
-                            callbacks=callbacks)
+                            callbacks=callbacks,
+                            class_weight=class_weight_dict)
 
         # 訓練後TPUモデルをCPUモデルに変換
         if use_tpu:
