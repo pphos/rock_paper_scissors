@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import (
@@ -69,13 +70,14 @@ class BaseModel(metaclass=ABCMeta):
         self.model = load_model(model_path)
         self.model.load_weights(weight_path)
 
-    def train(self, X_train, y_train, model_conf):
+    def train(self, X_train, y_train, model_conf, use_tpu=False):
         """
         モデルの学習
         # Arguments:
             X_train     : 訓練データ (Numpy配列)
             y_train     : 教師データのOne-hot表現 (Numpy配列)
             model_conf  : 学習に用いるパラメータを格納した辞書
+            use_tpu     : TPUの利用設定 (Google Colaboratory用)
         # Returns:
             history     : historyオブジェクト
         """
@@ -88,24 +90,51 @@ class BaseModel(metaclass=ABCMeta):
         else:
             class_weight_dict = None
 
-        # モデルのコンパイル
-        self.model.compile(loss=model_conf['loss'],
-                           optimizer=model_conf['optimizer'],
-                           metrics=model_conf['metrics'])
+        # TPUの利用設定
+        if use_tpu:
+            from tensorflow.contrib.tpu import (
+                keras_to_tpu_model,
+                TPUDistributionStrategy,
+            )
+            from tensorflow.contrib.cluster_resolver import (
+                TPUClusterResolver
+            )
+            model = keras_to_tpu_model(
+                self.model,
+                strategy=TPUDistributionStrategy(
+                    TPUClusterResolver(
+                        tpu='grpc://' + os.environ['COLAB_TPU_ADDR']
+                    )
+                )
+            )
+            model.compile(
+                optimizer=model_conf['loss'],
+                loss=model_conf['optimizer'],
+                metrics=model_conf['metrics'])
+        else:
+            # モデルのコンパイル
+            model = self.model
+            model.compile(loss=model_conf['loss'],
+                          optimizer=model_conf['optimizer'],
+                          metrics=model_conf['metrics'])
 
         # モデルの学習
-        history = self.model.fit(X_train, y_train,
-                                 batch_size=model_conf['batch_size'],
-                                 epochs=model_conf['epochs'],
-                                 verbose=1,
-                                 validation_split=model_conf['validation_split'],
-                                 callbacks=callbacks,
-                                 class_weight=class_weight_dict)
+        history = model.fit(X_train, y_train,
+                            batch_size=model_conf['batch_size'],
+                            epochs=model_conf['epochs'],
+                            verbose=1,
+                            validation_split=model_conf['validation_split'],
+                            callbacks=callbacks,
+                            class_weight=class_weight_dict)
+
+        # 訓練後TPUモデルをCPUモデルに変換
+        if use_tpu:
+            model = model.sync_to_cpu()
 
         # モデルの保存
         model_save_name = '{}_model.h5'.format(model_conf['name'])
         model_save_path = os.path.join(model_conf['save_dir'], model_save_name)
-        self.model.save(model_save_path)
+        model.save(model_save_path)
 
         # 訓練loss, accの描画
         save_name = "{}_training_loss_and_accuracy.png"\
