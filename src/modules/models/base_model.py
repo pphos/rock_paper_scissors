@@ -5,7 +5,6 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import (
     EarlyStopping,
-    ModelCheckpoint,
     ReduceLROnPlateau,
     TensorBoard
 )
@@ -16,6 +15,7 @@ from sklearn.metrics import (
 from sklearn.utils.class_weight import compute_class_weight
 from abc import ABCMeta, abstractmethod
 
+from .callbacks import ModelCheckpoint
 from ..utils.io import (
     determine_save_name_path,
     write_message
