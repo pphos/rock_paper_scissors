@@ -111,6 +111,7 @@ class BaseModel(metaclass=ABCMeta):
                 optimizer=model_conf['optimizer'],
                 loss=model_conf['loss'],
                 metrics=model_conf['metrics'])
+
         else:
             # モデルのコンパイル
             model = self.model
@@ -122,10 +123,8 @@ class BaseModel(metaclass=ABCMeta):
         history = model.fit(X_train, y_train,
                             batch_size=model_conf['batch_size'],
                             epochs=model_conf['epochs'],
-                            verbose=1,
                             validation_split=model_conf['validation_split'],
-                            callbacks=callbacks,
-                            class_weight=class_weight_dict)
+                            callbacks=callbacks)
 
         # 訓練後TPUモデルをCPUモデルに変換
         if use_tpu:
