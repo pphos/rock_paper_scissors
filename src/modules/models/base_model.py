@@ -70,19 +70,18 @@ class BaseModel(metaclass=ABCMeta):
         self.model = load_model(model_path)
         self.model.load_weights(weight_path)
 
-    def train(self, X_train, y_train, model_conf, use_tpu=False):
+    def train(self, X_train, y_train, model_conf):
         """
         モデルの学習
         # Arguments:
             X_train     : 訓練データ (Numpy配列)
             y_train     : 教師データのOne-hot表現 (Numpy配列)
             model_conf  : 学習に用いるパラメータを格納した辞書
-            use_tpu     : TPUの利用設定 (Google Colaboratory用)
         # Returns:
             history     : historyオブジェクト
         """
         # コールバック関数の設定
-        callbacks = _configure_callbacks(model_conf, use_tpu)
+        callbacks = _configure_callbacks(model_conf)
 
         # 指定がある場合にクラスごとに重み付けを行う
         if model_conf['set_class_weight']:
@@ -90,34 +89,11 @@ class BaseModel(metaclass=ABCMeta):
         else:
             class_weight_dict = None
 
-        # TPUの利用設定
-        if use_tpu:
-            from tensorflow.contrib.tpu import (
-                keras_to_tpu_model,
-                TPUDistributionStrategy,
-            )
-            from tensorflow.contrib.cluster_resolver import (
-                TPUClusterResolver
-            )
-            model = keras_to_tpu_model(
-                self.model,
-                strategy=TPUDistributionStrategy(
-                    TPUClusterResolver(
-                        tpu='grpc://' + os.environ['COLAB_TPU_ADDR']
-                    )
-                )
-            )
-            model.compile(
-                optimizer=model_conf['optimizer'],
-                loss=model_conf['loss'],
-                metrics=model_conf['metrics'])
-
-        else:
-            # モデルのコンパイル
-            model = self.model
-            model.compile(loss=model_conf['loss'],
-                          optimizer=model_conf['optimizer'],
-                          metrics=model_conf['metrics'])
+        # モデルのコンパイル
+        model = self.model
+        model.compile(loss=model_conf['loss'],
+                      optimizer=model_conf['optimizer'],
+                      metrics=model_conf['metrics'])
 
         # モデルの学習
         history = model.fit(X_train, y_train,
@@ -126,10 +102,6 @@ class BaseModel(metaclass=ABCMeta):
                             validation_split=model_conf['validation_split'],
                             callbacks=callbacks,
                             class_weight=class_weight_dict)
-
-        # 訓練後TPUモデルをCPUモデルに変換
-        if use_tpu:
-            model = model.sync_to_cpu()
 
         # モデルの保存
         model_save_name = '{}_model.h5'.format(model_conf['name'])
@@ -242,12 +214,11 @@ def _calc_class_weight(y_train):
     return class_weight_dict
 
 
-def _configure_callbacks(model_conf, use_tpu=False):
+def _configure_callbacks(model_conf):
     """
     コールバック関数の設定
     # Arguments:
         model_conf  : 学習に用いるパラメータを格納した辞書
-        use_tpu     : TPUの使用フラグ
     # Returns:
         callbacks   : コールバック関数を格納したリスト
     """
@@ -267,17 +238,15 @@ def _configure_callbacks(model_conf, use_tpu=False):
                                        min_lr=0.5e-6))
 
     # モデルの重みを保存
-    if not use_tpu:
-        save_weight_name = '{}_weights.{{epoch:03d}}-{{loss:.4f}}.hdf5'\
-            .format(model_conf['name'])
-        save_weight_path =\
-            os.path.join(model_conf['save_dir'], save_weight_name)
-        callbacks.append(ModelCheckpoint(filepath=save_weight_path,
-                                         monitor='val_loss',
-                                         verbose=1,
-                                         save_best_only=True,
-                                         save_weights_only=True,
-                                         mode='min'))
+    save_weight_name = '{}_weights.{{epoch:03d}}-{{loss:.4f}}.hdf5'\
+        .format(model_conf['name'])
+    save_weight_path = os.path.join(model_conf['save_dir'], save_weight_name)
+    callbacks.append(ModelCheckpoint(filepath=save_weight_path,
+                                     monitor='val_loss',
+                                     verbose=1,
+                                     save_best_only=True,
+                                     save_weights_only=True,
+                                     mode='min'))
 
     # TensorBoardの利用設定
     log_dir = os.path.join(model_conf['save_dir'], 'log_dir')
