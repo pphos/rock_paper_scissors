@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import (
+from keras.models import Sequential
+from keras.layers import (
     Dense, Dropout, Flatten,
     Conv2D, MaxPooling2D
 )

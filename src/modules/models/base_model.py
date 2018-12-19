@@ -124,6 +124,7 @@ class BaseModel(metaclass=ABCMeta):
                             batch_size=model_conf['batch_size'],
                             epochs=model_conf['epochs'],
                             validation_split=model_conf['validation_split'],
+                            callbacks=callbacks,
                             class_weight=class_weight_dict)
 
         # 訓練後TPUモデルをCPUモデルに変換
