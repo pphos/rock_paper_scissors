@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras.utils import plot_model
-from tensorflow.keras.models import load_model
-from tensorflow.keras.callbacks import (
+from keras.utils import plot_model
+from keras.models import load_model
+from keras.callbacks import (
     EarlyStopping,
     ReduceLROnPlateau,
-    TensorBoard
+    TensorBoard,
+    ModelCheckpoint
 )
 from sklearn.metrics import (
     classification_report,
@@ -16,7 +16,6 @@ from sklearn.metrics import (
 from sklearn.utils.class_weight import compute_class_weight
 from abc import ABCMeta, abstractmethod
 
-from .callbacks import ModelCheckpoint
 from ..utils.io import (
     determine_save_name_path,
     write_message
