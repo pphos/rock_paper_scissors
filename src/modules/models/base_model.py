@@ -239,7 +239,7 @@ def _configure_callbacks(model_conf):
     # モデルの重みを保存
     # save_weight_name = '{}_weights.{{epoch:03d}}-{{loss:.4f}}.hdf5'\
     #    .format(model_conf['name'])
-    save_weight_name = '{}_weights.hdf5'
+    save_weight_name = '{}_weights.hdf5'.format(model_conf['name'])
     save_weight_path = os.path.join(model_conf['save_dir'], save_weight_name)
     callbacks.append(ModelCheckpoint(filepath=save_weight_path,
                                      monitor='val_loss',
