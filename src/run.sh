@@ -8,13 +8,15 @@
 MODEL_NAME="MnistCNN"
 SAVE_ROOT='../results'
 
-TRAIN_DATA_PATH="../splited_dataset/training_features/data.npy"
-TRAIN_TARGET_PATH="../splited_dataset/training_features/target.npy"
-TRAIN_TARGET_LABEL_PATH="../splited_dataset/training_features/target_label.pkl"
+DATASET_BASE_DIR="../splited_dataset"
 
-TEST_DATA_PATH='../splited_dataset/eval_features/data.npy'
-TEST_TARGET_PATH='../splited_dataset/eval_features/target.npy'
-TEST_TARGET_LABEL_PATH='../splited_dataset/eval_features/target_label.pkl'
+TRAIN_DATA_PATH="${DATASET_BASE_DIR}/training_features/data.npy"
+TRAIN_TARGET_PATH="${DATASET_BASE_DIR}/training_features/target.npy"
+TRAIN_TARGET_LABEL_PATH="${DATASET_BASE_DIR}/training_features/target_label.pkl"
+
+TEST_DATA_PATH="${DATASET_BASE_DIR}/eval_features/data.npy"
+TEST_TARGET_PATH="${DATASET_BASE_DIR}/eval_features/target.npy"
+TEST_TARGET_LABEL_PATH="${DATASET_BASE_DIR}/eval_features/target_label.pkl"
 
 
 # 任意引数の設定
