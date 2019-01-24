@@ -6,8 +6,7 @@ from keras.models import load_model
 from keras.callbacks import (
     EarlyStopping,
     ReduceLROnPlateau,
-    TensorBoard,
-    ModelCheckpoint
+    TensorBoard
 )
 from sklearn.metrics import (
     classification_report,
@@ -106,6 +105,12 @@ class BaseModel(metaclass=ABCMeta):
         model_save_name = '{}_model.h5'.format(model_conf['name'])
         model_save_path = os.path.join(model_conf['save_dir'], model_save_name)
         model.save(model_save_path)
+
+        # モデルの重みの保存
+        save_weight_name = '{}_weight.hdf5'.format(model_conf['name'])
+        save_weight_path = os.path.join(model_conf['save_dir'],
+                                        save_weight_name)
+        model.save_weights(save_weight_path)
 
         # 訓練loss, accの描画
         save_name = "{}_training_loss_and_accuracy.png"\
@@ -235,18 +240,6 @@ def _configure_callbacks(model_conf):
                                        cooldown=0,
                                        patience=5,
                                        min_lr=0.5e-6))
-
-    # モデルの重みを保存
-    # save_weight_name = '{}_weights.{{epoch:03d}}-{{loss:.4f}}.hdf5'\
-    #     .format(model_conf['name'])
-    save_weight_name = 'best_model_weight.hdf5'
-    save_weight_path = os.path.join(model_conf['save_dir'], save_weight_name)
-    callbacks.append(ModelCheckpoint(filepath=save_weight_path,
-                                     monitor='val_loss',
-                                     verbose=1,
-                                     save_best_only=True,
-                                     save_weights_only=True,
-                                     mode='min'))
 
     # TensorBoardの利用設定
     log_dir = os.path.join(model_conf['save_dir'], 'log_dir')
