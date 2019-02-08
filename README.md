@@ -88,7 +88,7 @@ pipenvを用いない場合は、Pipfile内[packages]のライブラリを手動
 	```-n``` , ```sampling_times``` : Webカメラから保存する画像の枚数  
 	
 
-2. データセットを訓練用と評価用に分割
+2. データセットを訓練用と評価用に分割  
 	```$ python3 build_dataset.py ../../datasets/raw ../../datasets```
 	#### パラメータの説明
 	``` $ python3 build_dataset.py <raw_data_dir> <save_dir> ```
@@ -97,7 +97,7 @@ pipenvを用いない場合は、Pipfile内[packages]のライブラリを手動
 	```save_dir``` : 評価・訓練データの保存先  
 
 3. 訓練・評価セットの画像をそれぞれNumpy配列に変換  
-	```$ python3 convert_imgs_to_arrays.py ../../datasets/training_set ../../datasets/training_features```
+	```$ python3 convert_imgs_to_arrays.py ../../datasets/training_set ../../datasets/training_features```  
 	```$ python3 convert_imgs_to_arrays.py ../../datasets/eval_set ../../datasets/eval_features```
 
 4. スクリプトにdatasetのパスを書き入れて画像分類の実行  
@@ -106,5 +106,5 @@ git clone直後は```run.sh```において学習に用いるデータセット�
 3.の例では、```DATASET_BASE_DIR='../datasets'```となる。
 
 ### ・Google Colaboratoryを使用する場合
-```rock_paper_scissors.ipynb```を実行するだけ。
+```rock_paper_scissors.ipynb```を実行するだけ。  
 モデルのパラメータ調整は```init_each_config```内の値を変更することで可能。
