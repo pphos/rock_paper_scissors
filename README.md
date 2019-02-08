@@ -1,4 +1,4 @@
-# Rock Paper Scissors
+﻿# Rock Paper Scissors
 
 Kerasによるじゃんけん画像の分類。
 データセットを自前で用意すれば、他の画像分類も可能。
