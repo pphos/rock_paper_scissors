@@ -1,0 +1,13 @@
+              precision    recall  f1-score   support
+
+        Rock     1.0000    1.0000    1.0000       250
+       Paper     1.0000    1.0000    1.0000       250
+    Scissors     1.0000    1.0000    1.0000       250
+
+   micro avg     1.0000    1.0000    1.0000       750
+   macro avg     1.0000    1.0000    1.0000       750
+weighted avg     1.0000    1.0000    1.0000       750
+
+
+loss:  9.460649409228002e-05
+acc :  1.0
